@@ -1,12 +1,13 @@
 /// <reference path="typings/angular2/angular2.d.ts" />
+
 import {
     Component,
+    NgFor,
     View,
     bootstrap,
-    NgFor
 } from "angular2/angular2";
 
-//Model
+//Model of MVC
 class Article {
     title:string;
     link:string;
@@ -18,93 +19,109 @@ class Article {
         this.votes = 0;
     }
 
-    voteUp():boolean {
+    voteUp() {
         this.votes += 1;
-        return false;
     }
 
-    voteDown():boolean {
+    voteDown() {
         this.votes -= 1;
-        return false;
+    }
+
+    domain() {
+        var link = this.link.split('//')[1];
+        return link.split('/')[0];
     }
 }
 
-
 @Component({
-    selector: 'reddit-article'
+    selector: 'reddit-article',
+    properties: ['article']
 })
 
 @View({
     template: `
         <article>
-            <div class="votes">{{ article.votes }}</div>
-            <div class="main">
+            <div class="votes">{{ article.votes }}</div> <div class="main">
                 <h2>
-                    <a href="{{ article.link }}"> {{ article.title }}</a>
+                    <a href="{{ article.link }}">{{ article.title }}</a>
+                    <span>({{ article.domain() }})</span>
                 </h2>
                 <ul>
-                    <li><a href (click)='article.voteUp()'>up vote</a></li>
-                    <li><a href (click)='article.voteDown()'>down vote</a></li>
+                    <li><a href (click)='voteUp()'>upvote</a></li>
+                    <li><a href (click)='voteDown()'>downvote</a></li>
                 </ul>
             </div>
         </article>
-    `
+`
 })
 
-    /**
-     * Component Definition Class
-     */
 class RedditArticle {
-    article:Article;
+    article: Article;
 
-    constructor() {
-        this.article = new Article('Angular 2', 'http://angular.io');
+    voteUp() {
+        this.article.voteUp();
+        return false;
     }
 
+    voteDown() {
+        this.article.voteDown();
+        return false;
+    }
 }
-
-
-//Reddit App
 
 @Component({
     selector: 'reddit'
 })
 
 @View({
-    directives: [NgFor, RedditArticle],
     template: `
-        <section class="new-link">
-            <div class="control-group">
-                <div><labal for="title">Title:</labal></div>
-                <div><input name="title" #newtitle /></div>
+    <section class="new-link">
+        <div class="control-group">
+            <div>
+                <label for="title">Title:</label>
+             </div>
+             <div>
+                <input name="title" #newtitle />
+             </div>
+        </div>
+        <div class="control-group">
+            <div>
+                <label for="link">Link:</label>
             </div>
-            <div class="control-group">
-                <div><label for="link">Link:</label></div>
-                <div><input name="link" #newlink /></div>
+            <div>
+                <input name="link" #newlink>
             </div>
-            <button (click)="addArticle(newtitle, newlink)">Submit Link</button>
-        </section>
+        </div>
+      <button (click)="addArticle(newtitle, newlink)">Submit Link</button>
+    </section>
 
-        <reddit-article></reddit-article>
-    `
+    <reddit-article
+        *ng-for="#article of articles"
+        [article]="article" >
+     </reddit-article>
+`,
+    directives: [RedditArticle, NgFor]
 })
 
-    /**
-     * Component Definition Class
-     */
 class RedditApp {
 
-    articles:Array<Article>;
+    articles: Array<Article>;
 
     constructor() {
         this.articles = [
-            new Article('Angular 2', 'http;//angular.io'),
-            new Article('Fullstack', 'http://fullstack.io')
-        ]
+            new Article('Angular 2', 'http://angular.io'),
+            new Article('Fullstack', 'http://fullstack.io'),
+        ];
     }
 
     addArticle(title, link) {
-        console.log("Adding article with title ", title.value, " and link ", link.value);
+        this.articles.push(new Article(title.value, link.value));
+
+        //Clear input values
+        title.value = '';
+        link.value = '';
     }
 }
+
 bootstrap(RedditApp);
+

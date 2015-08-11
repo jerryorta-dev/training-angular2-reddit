@@ -10,9 +10,21 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "jspm": "^0.15.7",
     "typescript": "^1.5.0-beta"
   },
   "dependencies": {
     "live-server": "^0.8.1"
+  },
+  "jspm": {
+    "directories": {},
+    "dependencies": {
+      "lodash-node": "npm:lodash-node@^3.10.1",
+      "traceur": "github:jmcriffey/bower-traceur@^0.0.91"
+    },
+    "devDependencies": {
+      "traceur": "github:jmcriffey/bower-traceur@0.0.88",
+      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.88"
+    }
   }
 }
